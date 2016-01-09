@@ -21,8 +21,7 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <!--<fragment   android:name="app.alcanteria.com.sunshine.app.MainActivityFragment"
-                android:id="@+id/myFragment"
+    <!--<fragment   android:name="app.alcanteria.com.sunshine.app.ForecastFragment              android:id="@+id/myFragment"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
         />-->
