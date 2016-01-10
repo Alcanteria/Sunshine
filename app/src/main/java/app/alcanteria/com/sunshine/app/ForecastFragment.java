@@ -130,10 +130,17 @@ public class ForecastFragment extends Fragment {
                 final String FORECAST_FIVE_DAY = "forecast?";
 
                 // This is the City ID
-                final String CITY_ID = "id=" +params[0];
+                final String CITY_ID = "&id=" + params[0];
+
+                // Unit of temperature measurements.
+                final String TEMP_UNITS = "&units=imperial";
 
                 // Put it all together.
-                String dynamicUrl = FORECAST_BASE_URL + FORECAST_FIVE_DAY + CITY_ID + API_KEY;
+                String dynamicUrl = FORECAST_BASE_URL +
+                                    FORECAST_FIVE_DAY +
+                                    TEMP_UNITS +
+                                    CITY_ID +
+                                    API_KEY;
 
                 // Create the string for the OpenWeather query
                 URL url = new URL(dynamicUrl);
@@ -188,7 +195,7 @@ public class ForecastFragment extends Fragment {
 
             try{
                 WeatherDataParser parser = new WeatherDataParser();
-                return parser.getWeatherDataFromJson(forecastJsonStr, 5);
+                return parser.getWeatherDataFromJson(forecastJsonStr);
             }
             catch (JSONException e){
                 Log.e(LOG_TAG, e.getMessage(), e);

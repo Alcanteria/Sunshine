@@ -54,15 +54,15 @@ public class WeatherDataParser {
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
-    public String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
+    public String[] getWeatherDataFromJson(String forecastJsonStr)
             throws JSONException {
 
         // These are the names of the JSON objects that need to be extracted.
         final String OWM_LIST = "list";
         final String OWM_WEATHER = "weather";
         final String OWM_TEMPERATURE = "temp";
-        final String OWM_MAX = "max";
-        final String OWM_MIN = "min";
+        final String OWM_MAX = "temp_max";
+        final String OWM_MIN = "temp_min";
         final String OWM_DESCRIPTION = "main";
 
         JSONObject forecastJson = new JSONObject(forecastJsonStr);
@@ -84,8 +84,8 @@ public class WeatherDataParser {
 
         // now we work exclusively in UTC
         dayTime = new Time();
-
-        String[] resultStrs = new String[numDays];
+        Log.v(LOG_TAG, "weatherArray Size = " + weatherArray.length());
+        String[] resultStrs = new String[weatherArray.length()];
         for(int i = 0; i < weatherArray.length(); i++) {
             // For now, using the format "Day, description, hi/low"
             String day;
@@ -109,7 +109,9 @@ public class WeatherDataParser {
 
             // Temperatures are in a child object called "temp".  Try not to name variables
             // "temp" when working with temperature.  It confuses everybody.
-            JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
+            //JSONObject mainObject = dayForecast.getJSONObject(OWM_DESCRIPTION);
+            //JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
+            JSONObject temperatureObject = dayForecast.getJSONObject(OWM_DESCRIPTION);
             double high = temperatureObject.getDouble(OWM_MAX);
             double low = temperatureObject.getDouble(OWM_MIN);
 
