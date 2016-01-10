@@ -84,7 +84,7 @@ public class WeatherDataParser {
 
         // now we work exclusively in UTC
         dayTime = new Time();
-        Log.v(LOG_TAG, "weatherArray Size = " + weatherArray.length());
+        //Log.v(LOG_TAG, "weatherArray Size = " + weatherArray.length());
         String[] resultStrs = new String[weatherArray.length()];
         for(int i = 0; i < weatherArray.length(); i++) {
             // For now, using the format "Day, description, hi/low"
@@ -120,7 +120,7 @@ public class WeatherDataParser {
         }
 
         for (String s : resultStrs) {
-            Log.v(LOG_TAG, "Forecast entry: " + s);
+            //Log.v(LOG_TAG, "Forecast entry: " + s);
         }
         return resultStrs;
 

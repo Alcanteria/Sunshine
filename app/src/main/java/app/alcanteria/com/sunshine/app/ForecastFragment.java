@@ -33,6 +33,9 @@ public class ForecastFragment extends Fragment {
     // This is the API ID key. You need this to be able to access open weather.
     public final String API_KEY = "id=4140963&APPID=7b659b85252e20659cd4ea9d4c9b38a0";
 
+    // Array adapter to hold the forecast data.
+    public ArrayAdapter<String> forecastAdapter;
+
     public ForecastFragment() {
     }
 
@@ -52,23 +55,23 @@ public class ForecastFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container);
 
         String[] forecastArray = {
-                                    "Today - Sunny - 88 / 50",
-                                    "Tomorrow - Sunny - 50 / 40",
-                                    "Monday - Cloudy - 88 / 50",
-                                    "Tuesday - Cloudy - 30 / 20",
-                                    "Wednesday - Clear - 60 / 50",
-                                    "Thursday - Rain - 70 / 60",
-                                    "Today - Sunny - 88 / 50",
-                                    "Tomorrow - Sunny - 50 / 40",
-                                    "Monday - Cloudy - 88 / 50",
-                                    "Tuesday - Cloudy - 30 / 20",
-                                    "Wednesday - Clear - 60 / 50",
-                                    "Thursday - Rain - 70 / 60"
+                                    "DEFAULT Today - Sunny - 88 / 50",
+                                    "DEFAULT Tomorrow - Sunny - 50 / 40",
+                                    "DEFAULT Monday - Cloudy - 88 / 50",
+                                    "DEFAULT Tuesday - Cloudy - 30 / 20",
+                                    "DEFAULT Wednesday - Clear - 60 / 50",
+                                    "DEFAULT Thursday - Rain - 70 / 60",
+                                    "DEFAULT Today - Sunny - 88 / 50",
+                                    "DEFAULT Tomorrow - Sunny - 50 / 40",
+                                    "DEFAULT Monday - Cloudy - 88 / 50",
+                                    "DEFAULT Tuesday - Cloudy - 30 / 20",
+                                    "DEFAULT Wednesday - Clear - 60 / 50",
+                                    "DEFAULT Thursday - Rain - 70 / 60"
                                 };
 
         ArrayList<String> dummyData = new ArrayList<String>(Arrays.asList(forecastArray));
 
-        ArrayAdapter<String> forecastAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_forecast, R.id.list_item_forecast_textview, dummyData);
+        forecastAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_forecast, R.id.list_item_forecast_textview, dummyData);
 
         ListView listView = (ListView)rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(forecastAdapter);
@@ -146,7 +149,7 @@ public class ForecastFragment extends Fragment {
                 URL url = new URL(dynamicUrl);
 
                 // Check yo'self
-                Log.v(LOG_TAG, "Built Uri " + dynamicUrl);
+                //Log.v(LOG_TAG, "Built Uri " + dynamicUrl);
 
                 // Create the request to openweather and open the connection.
                 urlConnection = (HttpURLConnection)url.openConnection();
@@ -204,6 +207,15 @@ public class ForecastFragment extends Fragment {
 
             return null;
 
+        }
+
+        @Override
+        protected void onPostExecute(String[] results){
+            if(results != null){
+                forecastAdapter.clear();
+                for(String dayForecastString : results)
+                    forecastAdapter.add(dayForecastString);
+            }
         }
 
 
