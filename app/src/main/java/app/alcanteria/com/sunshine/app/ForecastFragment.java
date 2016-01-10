@@ -1,5 +1,6 @@
 package app.alcanteria.com.sunshine.app;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
@@ -11,8 +12,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 
@@ -50,8 +53,6 @@ public class ForecastFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-
-
         View rootView = inflater.inflate(R.layout.fragment_main, container);
 
         String[] forecastArray = {
@@ -76,12 +77,15 @@ public class ForecastFragment extends Fragment {
         ListView listView = (ListView)rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(forecastAdapter);
 
-        /************************************** FOR REALZ WEATHER API CALL */
-
-
-
-
-
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l){
+                String forecast = forecastAdapter.getItem(i);
+                Intent intent = new Intent(getActivity(), DetailActivity.class).putExtra(Intent.EXTRA_TEXT, forecast);
+                //Toast.makeText(getActivity(), forecast, Toast.LENGTH_SHORT).show();
+                startActivity(intent);
+            }
+        });
         return rootView;
     }
 
