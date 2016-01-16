@@ -1,8 +1,10 @@
 package app.alcanteria.com.sunshine.app;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +37,7 @@ import java.util.Arrays;
 public class ForecastFragment extends Fragment {
 
     // This is the API ID key. You need this to be able to access open weather.
-    public final String API_KEY = "id=4140963&APPID=7b659b85252e20659cd4ea9d4c9b38a0";
+    public final String API_KEY = "&id=4140963&APPID=7b659b85252e20659cd4ea9d4c9b38a0";
 
     // Array adapter to hold the forecast data.
     public ArrayAdapter<String> forecastAdapter;
@@ -55,34 +58,16 @@ public class ForecastFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container);
 
-        String[] forecastArray = {
-                                    "DEFAULT Today - Sunny - 88 / 50",
-                                    "DEFAULT Tomorrow - Sunny - 50 / 40",
-                                    "DEFAULT Monday - Cloudy - 88 / 50",
-                                    "DEFAULT Tuesday - Cloudy - 30 / 20",
-                                    "DEFAULT Wednesday - Clear - 60 / 50",
-                                    "DEFAULT Thursday - Rain - 70 / 60",
-                                    "DEFAULT Today - Sunny - 88 / 50",
-                                    "DEFAULT Tomorrow - Sunny - 50 / 40",
-                                    "DEFAULT Monday - Cloudy - 88 / 50",
-                                    "DEFAULT Tuesday - Cloudy - 30 / 20",
-                                    "DEFAULT Wednesday - Clear - 60 / 50",
-                                    "DEFAULT Thursday - Rain - 70 / 60"
-                                };
-
-        ArrayList<String> dummyData = new ArrayList<String>(Arrays.asList(forecastArray));
-
-        forecastAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_forecast, R.id.list_item_forecast_textview, dummyData);
+        forecastAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_forecast, R.id.list_item_forecast_textview, new ArrayList<String>());
 
         ListView listView = (ListView)rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(forecastAdapter);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l){
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String forecast = forecastAdapter.getItem(i);
                 Intent intent = new Intent(getActivity(), DetailActivity.class).putExtra(Intent.EXTRA_TEXT, forecast);
-                //Toast.makeText(getActivity(), forecast, Toast.LENGTH_SHORT).show();
                 startActivity(intent);
             }
         });
@@ -98,12 +83,23 @@ public class ForecastFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item){
         int id = item.getItemId();
         if(id == R.id.action_refresh) {
-            FetchWeatherTask weatherTask = new FetchWeatherTask();
-            weatherTask.execute("4140963");
+            updateWeather();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void updateWeather(){
+        FetchWeatherTask weatherTask = new FetchWeatherTask();
+        String location = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
+        weatherTask.execute(location);
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        updateWeather();
     }
 
     /* Performs the network activity to retrieve the weather forecast data. */
@@ -137,7 +133,14 @@ public class ForecastFragment extends Fragment {
                 final String FORECAST_FIVE_DAY = "forecast?";
 
                 // This is the City ID
-                final String CITY_ID = "&id=" + params[0];
+                //final String CITY_ID = "&id=" + params[0];
+
+                // This is the name of the city.
+                final String CITY_NAME = "q=" + params[0];
+                //final String CITY_NAME = "q=Washington, D.C.";
+
+                // Country code - DEFAULTS TO U.S.A.
+                final String COUNTRY_CODE = ",us";
 
                 // Unit of temperature measurements.
                 final String TEMP_UNITS = "&units=imperial";
@@ -145,15 +148,17 @@ public class ForecastFragment extends Fragment {
                 // Put it all together.
                 String dynamicUrl = FORECAST_BASE_URL +
                                     FORECAST_FIVE_DAY +
+                                    CITY_NAME +
+                                    COUNTRY_CODE +
                                     TEMP_UNITS +
-                                    CITY_ID +
                                     API_KEY;
 
                 // Create the string for the OpenWeather query
-                URL url = new URL(dynamicUrl);
+                //Uri uri = new URI(dynamicUrl.replace(" ", "%20"));
+                URL url = new URL(dynamicUrl.replace(" ", "%20"));
 
                 // Check yo'self
-                //Log.v(LOG_TAG, "Built Uri " + dynamicUrl);
+                Log.v(LOG_TAG, "Built Uri " + dynamicUrl);
 
                 // Create the request to openweather and open the connection.
                 urlConnection = (HttpURLConnection)url.openConnection();
