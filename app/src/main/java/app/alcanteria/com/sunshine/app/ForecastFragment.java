@@ -132,18 +132,14 @@ public class ForecastFragment extends Fragment {
                 // This is for a 5 day forecast
                 final String FORECAST_FIVE_DAY = "forecast?";
 
-                // This is the City ID
-                //final String CITY_ID = "&id=" + params[0];
-
                 // This is the name of the city.
                 final String CITY_NAME = "q=" + params[0];
-                //final String CITY_NAME = "q=Washington, D.C.";
 
                 // Country code - DEFAULTS TO U.S.A.
                 final String COUNTRY_CODE = ",us";
 
                 // Unit of temperature measurements.
-                final String TEMP_UNITS = "&units=imperial";
+                final String TEMP_UNITS = "&units=metric";
 
                 // Put it all together.
                 String dynamicUrl = FORECAST_BASE_URL +
@@ -153,8 +149,7 @@ public class ForecastFragment extends Fragment {
                                     TEMP_UNITS +
                                     API_KEY;
 
-                // Create the string for the OpenWeather query
-                //Uri uri = new URI(dynamicUrl.replace(" ", "%20"));
+                // Create the string for the OpenWeather query and replace spaces with permittable characters.
                 URL url = new URL(dynamicUrl.replace(" ", "%20"));
 
                 // Check yo'self
@@ -206,7 +201,9 @@ public class ForecastFragment extends Fragment {
             }
 
             try{
-                WeatherDataParser parser = new WeatherDataParser();
+
+
+                WeatherDataParser parser = new WeatherDataParser(getActivity());
                 return parser.getWeatherDataFromJson(forecastJsonStr);
             }
             catch (JSONException e){
@@ -226,7 +223,5 @@ public class ForecastFragment extends Fragment {
                     forecastAdapter.add(dayForecastString);
             }
         }
-
-
     }
 }

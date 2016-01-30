@@ -2,6 +2,10 @@ package app.alcanteria.com.sunshine.app;
 /**
  * Created by Nick on 1/9/2016.
  */
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.preference.PreferenceManager;
 import android.text.format.Time;
 import android.util.Log;
 
@@ -14,6 +18,12 @@ import java.text.SimpleDateFormat;
 public class WeatherDataParser {
 
     public final String LOG_TAG = "WeatherDataParser";
+
+    private Context context;
+
+    public WeatherDataParser(Context current){
+        this.context = current;
+    }
 
     private double GetMaxTemperatureForDay(String weatherJSONString, int dayIndex) throws JSONException {
 
@@ -115,7 +125,7 @@ public class WeatherDataParser {
             double high = temperatureObject.getDouble(OWM_MAX);
             double low = temperatureObject.getDouble(OWM_MIN);
 
-            highAndLow = formatHighLows(high, low);
+            highAndLow = FormatHighLows(high, low);
             resultStrs[i] = day + " - " + description + " - " + highAndLow;
         }
 
@@ -125,5 +135,33 @@ public class WeatherDataParser {
         return resultStrs;
 
 
+    }
+
+    /** Format the weather results for high/low display. */
+    private String FormatHighLows(double high, double low){
+            /* Weather results are returned as Celsius by default. This formats the weather values
+            * based on the user's preferences. */
+        // Get the user preferences ready to pass along to the weather data parser.
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String unitType = sharedPrefs.getString(
+                context.getString(R.string.pref_units_key),
+                context.getString(R.string.pref_units_metric));
+
+        if(unitType.equals(context.getString(R.string.pref_units_imperial))){
+            high = (high * 1.8) + 32;
+            low = (low * 1.8) + 32;
+        }
+        else if(!unitType.equals(context.getString(R.string.pref_units_metric))){
+            Log.d(LOG_TAG, "Unit type not found: " + unitType);
+        }
+
+        // Round to whole numbers.
+        long roundedHigh = Math.round(high);
+        long roundedLow = Math.round(low);
+
+        // Format into a single string.
+        String highLowString = roundedHigh + "/" + roundedLow;
+
+        return highLowString;
     }
 }
